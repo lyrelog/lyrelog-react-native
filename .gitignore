@@ -1,0 +1,21 @@
+.DS_Store
+node_modules/
+lib/
+coverage/
+build/
+.gradle/
+.cxx/
+.kotlin/
+local.properties
+*.iml
+.idea/
+xcuserdata/
+DerivedData/
+**/Pods/
+*.jsbundle
+*.tgz
+.metro-health-check*
+lyrelog.local.json
+
+# Agents guide: kept on the maintainer's machine, not in the public repo
+CLAUDE.md

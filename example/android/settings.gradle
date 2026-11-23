@@ -1,0 +1,10 @@
+// The pnpm workspace keeps one node_modules at the repo root, two levels up.
+pluginManagement { includeBuild("../../node_modules/@react-native/gradle-plugin") }
+plugins { id("com.facebook.react.settings") }
+extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
+    // The CLI through node, never npx.
+    ex.autolinkLibrariesFromCommand(["node", "../node_modules/@react-native-community/cli/build/bin.js", "config"])
+}
+rootProject.name = 'com.example.driftwood'
+include ':app'
+includeBuild('../../node_modules/@react-native/gradle-plugin')

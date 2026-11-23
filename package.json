@@ -1,0 +1,95 @@
+{
+  "name": "@lyrelog/react-native",
+  "version": "0.9.0",
+  "description": "Structured logs, errors and crashes from your React Native app to Lyrelog, the hosted log service. A thin layer over the Lyrelog Swift and Android SDKs.",
+  "license": "MIT",
+  "author": "Lyrelog <hello@lyrelog.com>",
+  "homepage": "https://lyrelog.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lyrelog/lyrelog-react-native.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lyrelog/lyrelog-react-native/issues"
+  },
+  "keywords": [
+    "lyrelog",
+    "react-native",
+    "logging",
+    "logs",
+    "structured-logging",
+    "error-tracking",
+    "crash-reporting",
+    "ios",
+    "android"
+  ],
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "react-native": "./src/index.ts",
+  "source": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "source": "./src/index.ts",
+      "react-native": "./src/index.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "lib",
+    "ios",
+    "android/build.gradle",
+    "android/src",
+    "!android/src/test",
+    "LyrelogReactNative.podspec",
+    "!**/__tests__",
+    "!**/*.test.ts",
+    "!**/*.test.tsx",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "jest",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p example",
+    "prepack": "pnpm build"
+  },
+  "peerDependencies": {
+    "react": ">=19.0.0 <20.0.0",
+    "react-native": ">=0.80.0 <1.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "7.29.13",
+    "@react-native/babel-preset": "0.88.1",
+    "@react-native/jest-preset": "0.88.1",
+    "@react-native/typescript-config": "0.88.1",
+    "@types/jest": "29.5.14",
+    "@types/react": "19.3.0",
+    "@types/react-test-renderer": "19.3.1",
+    "jest": "29.7.0",
+    "react": "19.3.0",
+    "react-native": "0.88.1",
+    "react-test-renderer": "19.3.0",
+    "typescript": "7.0.2"
+  },
+  "codegenConfig": {
+    "name": "RNLyrelogSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.lyrelog.reactnative"
+    },
+    "ios": {
+      "modulesProvider": {
+        "Lyrelog": "RNLyrelog"
+      }
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "packageManager": "pnpm@12.21.0"
+}

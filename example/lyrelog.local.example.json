@@ -1,0 +1,5 @@
+{
+  "apiKey": "lyr_ing_...",
+  "iosEndpoint": "http://127.0.0.1:8090",
+  "androidEndpoint": "http://10.0.2.2:8090"
+}

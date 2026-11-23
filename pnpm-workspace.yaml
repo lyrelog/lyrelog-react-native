@@ -1,0 +1,5 @@
+packages:
+  - example
+
+# React Native's autolinking, codegen and Gradle expect one flat node_modules.
+nodeLinker: hoisted

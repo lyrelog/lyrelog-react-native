@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "allowImportingTsExtensions": false,
+    "outDir": "lib",
+    "rootDir": "src",
+    "types": []
+  },
+  "exclude": ["node_modules", "lib", "example", "src/**/__tests__"]
+}

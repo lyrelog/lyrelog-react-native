@@ -1,0 +1,41 @@
+// The React Native module over the Lyrelog Android SDK (com.lyrelog:lyrelog-android). Built as a
+// subproject of the app (autolinking), so the app's Android Gradle and Kotlin plugins apply.
+apply plugin: "com.android.library"
+apply plugin: "org.jetbrains.kotlin.android"
+apply plugin: "com.facebook.react"
+
+def safeExtGet(name, fallback) {
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : fallback
+}
+
+android {
+  namespace "com.lyrelog.reactnative"
+  compileSdkVersion safeExtGet("compileSdkVersion", 37)
+
+  defaultConfig {
+    minSdkVersion safeExtGet("minSdkVersion", 24)
+    targetSdkVersion safeExtGet("targetSdkVersion", 36)
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
+  }
+
+  sourceSets {
+    main {
+      java.srcDirs += ["build/generated/source/codegen/java"]
+    }
+  }
+}
+
+repositories {
+  google()
+  mavenCentral()
+}
+
+dependencies {
+  implementation "com.facebook.react:react-android"
+  api "com.lyrelog:lyrelog-android:0.9.0"
+  testImplementation "junit:junit:4.13.2"
+}
