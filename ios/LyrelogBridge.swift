@@ -17,15 +17,34 @@ public final class LyrelogBridge: NSObject {
     /// Logs, then waits (at most `timeoutMs`) until it's on disk and an upload was tried: a fatal
     /// JavaScript error is about to end the app. Called on the JavaScript thread, never the main one.
     @objc public static func logNow(_ level: String, message: String, category: String?, attrs: NSDictionary?, payload: NSDictionary?, timeoutMs: Double) -> Bool {
-        log(level, message: message, category: category, attrs: attrs, payload: payload)
+        let total = Int(max(1, min(timeoutMs, 5000)))
+        let start = DispatchTime.now()
+        let severity = logLevel(level)
+        let fields = attributes(attrs)
+        let value = unwrap(payload)
+        // Behind the log calls still waiting on the method queue, so the last events before the
+        // crash keep their order (a third of the time at most, 500 ms).
+        InOrder.behindQueued(methodQueue, key: methodQueueKey, timeoutMs: min(total / 3, 500)) {
+            Lyrelog.log(severity, message, category: category, attrs: fields, payload: value)
+        }
         let done = DispatchSemaphore(value: 0)
         Task.detached {
             await Lyrelog.flush()
             done.signal()
         }
-        let wait = max(1, min(timeoutMs, 5000))
-        return done.wait(timeout: .now() + .milliseconds(Int(wait))) == .success
+        let spent = Int((DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds) / 1_000_000)
+        return done.wait(timeout: .now() + .milliseconds(max(1, total - spent))) == .success
     }
+
+    /// The TurboModule's method queue (`RNLyrelog.methodQueue`): its own, so `logNow` waits only
+    /// for Lyrelog's calls, not other modules' (React Native's shared queue).
+    @objc public static let methodQueue: DispatchQueue = {
+        let queue = DispatchQueue(label: "com.lyrelog.reactnative", qos: .utility)
+        queue.setSpecific(key: methodQueueKey, value: true)
+        return queue
+    }()
+
+    static let methodQueueKey = DispatchSpecificKey<Bool>()
 
     @objc public static func setUser(_ id: String?) {
         Lyrelog.setUser(id)
@@ -61,7 +80,7 @@ public final class LyrelogBridge: NSObject {
     // MARK: - Values
 
     /// This package's version, named in `resource.sdk` before the Swift SDK's (package.json).
-    static let wrapperVersion = "0.9.0"
+    static let wrapperVersion = "1.0.0"
 
     static func configuration(_ map: NSDictionary) -> Lyrelog.Configuration? {
         guard let apiKey = map["apiKey"] as? String, !apiKey.isEmpty else { return nil }

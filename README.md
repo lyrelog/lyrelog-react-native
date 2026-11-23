@@ -20,11 +20,9 @@ and report native crashes; this package adds the JavaScript side (uncaught error
 promise rejections, React render errors, React Navigation screens).
 
 React Native 0.80 or later (before 1.0) with the New Architecture, React 19. iOS 16 and
-Android 7.0 (API 24) or later. Version 0.9.0, over the Swift and Android SDKs 0.9.0.
+Android 7.0 (API 24) or later. Version 1.0.0, over the Swift and Android SDKs 1.0.0.
 
 ## Install
-
-Not published yet. Once it is:
 
 ```sh
 pnpm add @lyrelog/react-native

@@ -13,6 +13,12 @@
   return @"Lyrelog";
 }
 
+// Lyrelog's own serial queue for the void calls, which `logNow` waits behind (LyrelogBridge).
+- (dispatch_queue_t)methodQueue
+{
+  return LyrelogBridge.methodQueue;
+}
+
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:(const facebook::react::ObjCTurboModule::InitParams &)params
 {
   return std::make_shared<facebook::react::NativeLyrelogSpecJSI>(params);

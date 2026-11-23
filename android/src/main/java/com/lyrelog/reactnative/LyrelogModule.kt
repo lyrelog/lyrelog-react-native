@@ -1,5 +1,6 @@
 package com.lyrelog.reactnative
 
+import android.os.SystemClock
 import android.util.Log
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -39,9 +40,21 @@ class LyrelogModule(private val context: ReactApplicationContext) : NativeLyrelo
 
     override fun logNow(level: String, message: String, category: String?, attrs: ReadableMap?, payload: ReadableMap?, timeoutMs: Double): Boolean {
         return try {
-            Lyrelog.log(level(level), message, category, attrs?.let(::toMap), unwrap(payload))
+            val start = SystemClock.elapsedRealtime()
+            val total = timeoutMs.toLong().coerceIn(1, 5_000)
+            val fields = attrs?.let(::toMap)
+            val value = unwrap(payload)
+            val record = { guarded { Lyrelog.log(level(level), message, category, fields, value) } }
+            // Behind the log calls still waiting on the native modules thread, so the last events
+            // before the crash keep their order (a third of the time at most, 500 ms).
+            if (context.isOnNativeModulesQueueThread) {
+                record()
+            } else {
+                InOrder.behindQueued(minOf(total / 3, 500), context::runOnNativeModulesQueueThread, record)
+            }
+            val left = (total - (SystemClock.elapsedRealtime() - start)).coerceAtLeast(1)
             // On the JS thread, never the main one: the SDK's flushes block there.
-            crashes.recordFatal(timeoutMs.toLong(), Lyrelog::flushToDisk, Lyrelog::flush)
+            crashes.recordFatal(left, Lyrelog::flushToDisk, Lyrelog::flush)
         } catch (e: Throwable) {
             false
         }
@@ -87,7 +100,7 @@ class LyrelogModule(private val context: ReactApplicationContext) : NativeLyrelo
     companion object {
         const val NAME = "Lyrelog"
         /** This package's version, named in `resource.sdk` before the Android SDK's (package.json). */
-        const val WRAPPER_VERSION = "0.9.0"
+        const val WRAPPER_VERSION = "1.0.0"
         private const val TAG = "Lyrelog"
 
         /** One per process, like the SDK's crash recorder (a reload makes a new module). */

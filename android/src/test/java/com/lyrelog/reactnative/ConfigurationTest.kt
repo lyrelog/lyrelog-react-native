@@ -40,8 +40,8 @@ class ConfigurationTest {
     @Test
     fun namesThisPackageInResourceSdk() {
         val configuration = LyrelogModule.configuration(JavaOnlyMap.of("apiKey", "k"))!!
-        assertEquals("lyrelog-react-native/0.9.0", configuration.wrapper)
-        assertEquals("0.9.0", LyrelogModule.WRAPPER_VERSION)
+        assertEquals("lyrelog-react-native/1.0.0", configuration.wrapper)
+        assertEquals("1.0.0", LyrelogModule.WRAPPER_VERSION)
     }
 
     @Test
