@@ -14,7 +14,7 @@
 </p>
 
 Structured logs, JavaScript errors and crashes from your React Native app to
-[Lyrelog](https://lyrelog.com), a hosted log service. A thin TurboModule over the Lyrelog Swift
+[Lyrelog](https://lyrelog.com/platforms/react-native), a hosted log service. A thin TurboModule over the Lyrelog Swift
 SDK (iOS) and Android SDK: the native SDKs queue on disk, send in batches, retry, keep sessions
 and report native crashes; this package adds the JavaScript side (uncaught errors, unhandled
 promise rejections, React render errors, React Navigation screens).
