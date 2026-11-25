@@ -28,13 +28,14 @@ const root = path.join(__dirname, "..", "..");
 const read = (file: string) => fs.readFileSync(path.join(root, file), "utf8");
 
 describe("version", () => {
-  it("is the same in package.json, the Swift and Kotlin bridges and the native SDKs they need", () => {
-    expect(pkg.version).toBe("1.0.0");
+  it("is the same in package.json and the Swift and Kotlin bridges, over the native SDKs it needs", () => {
+    expect(pkg.version).toBe("1.0.1");
     expect(read("ios/LyrelogBridge.swift")).toContain(`static let wrapperVersion = "${pkg.version}"`);
     expect(read("android/src/main/java/com/lyrelog/reactnative/LyrelogModule.kt")).toContain(`const val WRAPPER_VERSION = "${pkg.version}"`);
-    // The native SDKs ship in step with this package.
-    expect(read("android/build.gradle")).toContain(`"com.lyrelog:lyrelog-android:${pkg.version}"`);
-    expect(read("LyrelogReactNative.podspec")).toContain(`minimumVersion: "${pkg.version}"`);
+    // The native SDKs have their own versions since 1.0.1 (Swift 1.1.1 brought its crash
+    // reporter and crashAlreadyReported, which the bridge calls; Android stayed at 1.0.0).
+    expect(read("android/build.gradle")).toContain(`"com.lyrelog:lyrelog-android:1.0.0"`);
+    expect(read("LyrelogReactNative.podspec")).toContain(`minimumVersion: "1.1.1"`);
   });
 });
 

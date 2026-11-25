@@ -3,7 +3,8 @@ require "json"
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 
 # The Lyrelog Swift SDK, as a Swift package (React Native's `spm_dependency`): the git URL below,
-# from 1.0.0 up to the next minor version. To work on both at once, LYRELOG_SWIFT_PATH points at a
+# from 1.1.1 up to the next minor version (1.1 catches crashes in the app's process; 1.1.1 lets a
+# fatal JavaScript error say it's already reported). To work on both at once, LYRELOG_SWIFT_PATH points at a
 # local checkout instead.
 LYRELOG_SWIFT_URL = "https://github.com/lyrelog/lyrelog-swift.git"
 lyrelog_swift_local = ENV["LYRELOG_SWIFT_PATH"]
@@ -28,7 +29,7 @@ Pod::Spec.new do |s|
   else
     spm_dependency(s,
       url: LYRELOG_SWIFT_URL,
-      requirement: { kind: "upToNextMinorVersion", minimumVersion: "1.0.0" },
+      requirement: { kind: "upToNextMinorVersion", minimumVersion: "1.1.1" },
       products: ["Lyrelog"])
   end
 end

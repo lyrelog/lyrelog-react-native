@@ -17,6 +17,9 @@ public final class LyrelogBridge: NSObject {
     /// Logs, then waits (at most `timeoutMs`) until it's on disk and an upload was tried: a fatal
     /// JavaScript error is about to end the app. Called on the JavaScript thread, never the main one.
     @objc public static func logNow(_ level: String, message: String, category: String?, attrs: NSDictionary?, payload: NSDictionary?, timeoutMs: Double) -> Bool {
+        // React Native aborts the app next: the Swift SDK's crash reporter doesn't report that
+        // crash again (the Android side skips its recorder for the same reason).
+        Lyrelog.crashAlreadyReported()
         let total = Int(max(1, min(timeoutMs, 5000)))
         let start = DispatchTime.now()
         let severity = logLevel(level)
@@ -80,7 +83,7 @@ public final class LyrelogBridge: NSObject {
     // MARK: - Values
 
     /// This package's version, named in `resource.sdk` before the Swift SDK's (package.json).
-    static let wrapperVersion = "1.0.0"
+    static let wrapperVersion = "1.0.1"
 
     static func configuration(_ map: NSDictionary) -> Lyrelog.Configuration? {
         guard let apiKey = map["apiKey"] as? String, !apiKey.isEmpty else { return nil }
