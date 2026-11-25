@@ -1,6 +1,6 @@
 {
   "name": "@lyrelog/react-native",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Structured logs, errors and crashes from your React Native app to Lyrelog, the hosted log service. A thin layer over the Lyrelog Swift and Android SDKs.",
   "license": "MIT",
   "author": "Lyrelog <hello@lyrelog.com>",
