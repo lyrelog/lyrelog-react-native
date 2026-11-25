@@ -36,6 +36,6 @@ repositories {
 
 dependencies {
   implementation "com.facebook.react:react-android"
-  api "com.lyrelog:lyrelog-android:1.1.0"
+  api "com.lyrelog:lyrelog-android:1.1.1"
   testImplementation "junit:junit:4.13.2"
 }

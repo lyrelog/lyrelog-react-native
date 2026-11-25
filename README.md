@@ -113,8 +113,11 @@ fatal are capped at 10 a minute, the same one at most once every 10 seconds
 </LyrelogErrorBoundary>
 ```
 
-Native crashes are the native SDKs' (`captureCrashes`, on by default): on Android uncaught JVM
-exceptions, on iOS MetricKit's crash reports, sent on the next launch as `app_crashed`.
+Native crashes are the native SDKs' (`captureCrashes`, on by default), sent on the next launch:
+on Android uncaught JVM exceptions (`app_crashed`), and ANRs (`app_hung`) and native crashes
+(`app_crashed`) from Android's own records (Android 11 and later); on iOS crashes caught in the
+app's own process (`app_crashed`) and hangs from MetricKit (`app_hung`). Upload each build's
+symbols (`lyrelog symbols upload`) to read their frames as your source.
 
 ### Consent, flush, close
 
