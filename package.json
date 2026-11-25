@@ -1,6 +1,6 @@
 {
   "name": "@lyrelog/react-native",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Structured logs, errors and crashes from your React Native app to Lyrelog, the hosted log service. A thin layer over the Lyrelog Swift and Android SDKs.",
   "license": "MIT",
   "author": "Lyrelog <hello@lyrelog.com>",
@@ -34,6 +34,7 @@
       "react-native": "./src/index.ts",
       "default": "./lib/index.js"
     },
+    "./metro": "./metro.js",
     "./package.json": "./package.json"
   },
   "files": [
@@ -44,6 +45,7 @@
     "android/src",
     "!android/src/test",
     "LyrelogReactNative.podspec",
+    "metro.js",
     "!**/__tests__",
     "!**/*.test.ts",
     "!**/*.test.tsx",

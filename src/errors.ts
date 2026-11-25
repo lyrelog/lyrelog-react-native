@@ -1,5 +1,6 @@
 // JavaScript errors: how one is described (the `exception` and `app_crashed` events share it)
 // and the hooks that see the ones nobody caught.
+import { debugIdsOf } from "./debug-ids";
 import { cut, errorFields, toPlain, type Plain } from "./values";
 
 export interface Described {
@@ -35,6 +36,19 @@ export function describe(error: unknown, componentStack?: string | null): Descri
     message = safeString(() => String(error));
   }
   const payload = describePayload(error, 0);
+  // The bundles the stacks are in, by the debug ids `withLyrelog` gave them: the server reads the
+  // frames with their source maps.
+  const stacks: string[] = [];
+  for (let e: unknown = payload; typeof e === "object" && e !== null; e = (e as { cause?: unknown }).cause) {
+    const stack = (e as { stack?: unknown }).stack;
+    if (typeof stack === "string") stacks.push(stack);
+  }
+  try {
+    const ids = debugIdsOf(stacks, (s) => s);
+    if (ids !== undefined) payload.debug_ids = ids;
+  } catch {
+    // never into the app
+  }
   if (componentStack) payload.component_stack = toPlain(componentStack);
   return { type: cut(type), message: cut(message), payload };
 }

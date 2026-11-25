@@ -29,7 +29,7 @@ const read = (file: string) => fs.readFileSync(path.join(root, file), "utf8");
 
 describe("version", () => {
   it("is the same in package.json and the Swift and Kotlin bridges, over the native SDKs it needs", () => {
-    expect(pkg.version).toBe("1.0.3");
+    expect(pkg.version).toBe("1.1.0");
     expect(read("ios/LyrelogBridge.swift")).toContain(`static let wrapperVersion = "${pkg.version}"`);
     expect(read("android/src/main/java/com/lyrelog/reactnative/LyrelogModule.kt")).toContain(`const val WRAPPER_VERSION = "${pkg.version}"`);
     // The native SDKs have their own versions since 1.0.1 (Swift 1.1.1 brought its crash

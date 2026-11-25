@@ -83,7 +83,7 @@ public final class LyrelogBridge: NSObject {
     // MARK: - Values
 
     /// This package's version, named in `resource.sdk` before the Swift SDK's (package.json).
-    static let wrapperVersion = "1.0.3"
+    static let wrapperVersion = "1.1.0"
 
     static func configuration(_ map: NSDictionary) -> Lyrelog.Configuration? {
         guard let apiKey = map["apiKey"] as? String, !apiKey.isEmpty else { return nil }

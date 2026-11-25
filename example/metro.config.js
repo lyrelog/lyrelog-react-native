@@ -1,5 +1,6 @@
 const path = require('path');
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
+const { withLyrelog } = require('../metro');
 
 // The library is the repo root (one level up), and the workspace keeps one node_modules there.
 const root = path.resolve(__dirname, '..');
@@ -12,4 +13,5 @@ const config = {
   },
 };
 
-module.exports = mergeConfig(getDefaultConfig(__dirname), config);
+// withLyrelog: release bundles get their debug ids, for readable stacks (../metro.js).
+module.exports = withLyrelog(mergeConfig(getDefaultConfig(__dirname), config));

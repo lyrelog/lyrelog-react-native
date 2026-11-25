@@ -100,7 +100,7 @@ class LyrelogModule(private val context: ReactApplicationContext) : NativeLyrelo
     companion object {
         const val NAME = "Lyrelog"
         /** This package's version, named in `resource.sdk` before the Android SDK's (package.json). */
-        const val WRAPPER_VERSION = "1.0.3"
+        const val WRAPPER_VERSION = "1.1.0"
         private const val TAG = "Lyrelog"
 
         /** One per process, like the SDK's crash recorder (a reload makes a new module). */

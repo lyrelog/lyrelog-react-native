@@ -119,6 +119,28 @@ on Android uncaught JVM exceptions (`app_crashed`), and ANRs (`app_hung`) and na
 app's own process (`app_crashed`) and hangs from MetricKit (`app_hung`). Upload each build's
 symbols (`lyrelog symbols upload`) to read their frames as your source.
 
+### Readable stacks in release builds
+
+A release build's JavaScript is minified, and on Hermes compiled to bytecode, so its stacks read
+`at onPress (address at main.jsbundle:1:716194)`. Give each release bundle a debug id in
+`metro.config.js`, and upload its source map with the
+[command-line tool](https://docs.lyrelog.com/cli) after building: frames then show the function,
+file and line of your source (`Button.props.onPress src/App.tsx:53`).
+
+```js
+// metro.config.js
+const { withLyrelog } = require('@lyrelog/react-native/metro');
+module.exports = withLyrelog(mergeConfig(getDefaultConfig(__dirname), config));
+```
+
+```bash
+lyrelog sourcemaps upload android/app/build          # Android, after ./gradlew assembleRelease
+lyrelog sourcemaps upload "$SOURCEMAP_FILE"           # iOS, in the Xcode build (see the docs)
+```
+
+On iOS, React Native writes the source map only when `SOURCEMAP_FILE` is set in the
+"Bundle React Native code and images" phase. Development bundles are left as they are.
+
 ### Consent, flush, close
 
 ```ts
