@@ -30,3 +30,19 @@ describe("debug ids", () => {
     expect(describeError(error).payload).not.toHaveProperty("debug_ids");
   });
 });
+
+describe("debug ids, as the server reads frames", () => {
+  afterEach(() => {
+    delete g._lyrelogDebugIds;
+    delete g._sentryDebugIds;
+  });
+
+  it("keeps Lyrelog's id for a bundle Sentry's tools gave one too", () => {
+    const key = "Error\n    at anonymous (address at main.jsbundle:1:200)";
+    (g._lyrelogDebugIds = {} as Record<string, string>)[key] = ID;
+    (g._sentryDebugIds = {} as Record<string, string>)[key] = "11111111-2222-4333-8444-555555555555";
+    const error = new Error("Bucket handle snapped");
+    error.stack = "Error: Bucket handle snapped\n    at onPress (address at main.jsbundle:1:654321)";
+    expect(describeError(error).payload.debug_ids).toEqual({ "main.jsbundle": ID });
+  });
+});

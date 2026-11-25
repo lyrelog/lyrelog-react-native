@@ -19,3 +19,6 @@ lyrelog.local.json
 
 # Agents guide: kept on the maintainer's machine, not in the public repo
 CLAUDE.md
+
+# Xcode resolves the Swift package here when it opens the example: not the repo's
+example/ios/*.xcworkspace/xcshareddata/swiftpm/

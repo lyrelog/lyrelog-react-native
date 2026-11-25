@@ -15,29 +15,32 @@ const REGISTRIES = ["_lyrelogDebugIds", "_sentryDebugIds"] as const;
 /** At most this many bundles are named for one exception (the server reads 8). */
 export const MAX_DEBUG_IDS = 8;
 
-/** The URL of a stack frame line, as Hermes, JavaScriptCore and V8 print them; undefined if none. */
+/**
+ * The URL of a stack frame line, as Hermes, JavaScriptCore and V8 print them; undefined if none. Read as
+ * the server reads it: a V8 frame's location is after the first " (" (a URL may hold parentheses
+ * itself: Next.js's route groups, `app/(shop)/page.js`).
+ */
 export function frameURL(line: string): string | undefined {
-  let s = line.trim();
-  if (s.endsWith(")")) {
-    const open = s.lastIndexOf("(");
-    if (open < 0) return undefined;
-    s = s.slice(open + 1, -1);
-  } else if (s.startsWith("at ")) {
-    s = s.slice(3).replace(/^async /, "");
+  const s = line.trim();
+  // Hermes running bytecode: "address at index.android.bundle:1:9876".
+  let loc: string;
+  if (s.startsWith("at ")) {
+    const rest = s.slice(3).replace(/^async /, "");
+    const open = rest.indexOf(" (");
+    loc = open >= 0 && rest.endsWith(")") ? rest.slice(open + 2, -1) : rest;
   } else {
     const at = s.indexOf("@");
     if (at < 0) return undefined;
-    s = s.slice(at + 1);
+    loc = s.slice(at + 1);
   }
-  // Hermes running bytecode: "address at index.android.bundle:1:9876".
-  s = s.replace(/^address at /, "");
-  const m = /^(.+):\d+:\d+$/.exec(s);
+  loc = loc.replace(/^address at /, "");
+  const m = /^(.+):\d+:\d+$/.exec(loc);
   return m ? m[1] : undefined;
 }
 
-let cachedCount = -1;
-let cachedClean: ((stack: string) => string) | undefined;
-let cached = new Map<string, string>();
+/** The registries read as bundle URL (as their stacks print it) to id, kept until one changes. */
+let cachedSignature = "";
+let cachedRaw = new Map<string, string>();
 
 function registry(): Record<string, unknown>[] {
   const out: Record<string, unknown>[] = [];
@@ -54,31 +57,41 @@ function registry(): Record<string, unknown>[] {
 }
 
 /**
- * The registry as URL to id, URLs cleaned as the stacks are (`clean`). Read again only when
- * bundles were added (a lazily loaded chunk registers when it loads).
+ * The registry as URL to id, URLs cleaned as the stacks are (`clean`). The registries are read
+ * again only when one changes (a lazily loaded chunk registers when it loads, a bundle loaded
+ * again can bring another id). A bundle Lyrelog gave an id keeps Lyrelog's when Sentry's tools
+ * gave it one too: Lyrelog's maps are uploaded under Lyrelog's.
  */
 export function debugIdsByURL(clean: (stack: string) => string): Map<string, string> {
   const registries = registry();
-  let count = 0;
-  for (const r of registries) count += Object.keys(r).length;
-  if (count === cachedCount && clean === cachedClean) return cached;
-  const next = new Map<string, string>();
+  let signature = "";
   for (const r of registries) {
-    for (const [stack, id] of Object.entries(r)) {
-      if (typeof id !== "string") continue;
-      for (const line of stack.split("\n")) {
-        const url = frameURL(line);
-        if (url !== undefined) {
-          next.set(clean(url), id);
-          break;
+    for (const [stack, id] of Object.entries(r)) signature += `${stack.length}:${String(id)};`;
+    signature += "|";
+  }
+  if (signature !== cachedSignature) {
+    const next = new Map<string, string>();
+    for (const r of registries) {
+      for (const [stack, id] of Object.entries(r)) {
+        if (typeof id !== "string") continue;
+        for (const line of stack.split("\n")) {
+          const url = frameURL(line);
+          if (url !== undefined) {
+            if (!next.has(url)) next.set(url, id);
+            break;
+          }
         }
       }
     }
+    cachedRaw = next;
+    cachedSignature = signature;
   }
-  cached = next;
-  cachedCount = count;
-  cachedClean = clean;
-  return next;
+  const out = new Map<string, string>();
+  for (const [url, id] of cachedRaw) {
+    const cleaned = clean(url);
+    if (!out.has(cleaned)) out.set(cleaned, id);
+  }
+  return out;
 }
 
 /** The debug ids of the bundles in these stacks, or undefined when none has one. */

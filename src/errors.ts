@@ -22,6 +22,8 @@ export function isError(value: unknown): value is Error {
 }
 
 /** Like `@lyrelog/js`: the same attributes and payload shape, so both read the same on the dashboard. */
+const sameStack = (s: string) => s;
+
 export function describe(error: unknown, componentStack?: string | null): Described {
   let type: string = typeof error;
   let message: string;
@@ -38,13 +40,13 @@ export function describe(error: unknown, componentStack?: string | null): Descri
   const payload = describePayload(error, 0);
   // The bundles the stacks are in, by the debug ids `withLyrelog` gave them: the server reads the
   // frames with their source maps.
-  const stacks: string[] = [];
-  for (let e: unknown = payload; typeof e === "object" && e !== null; e = (e as { cause?: unknown }).cause) {
-    const stack = (e as { stack?: unknown }).stack;
-    if (typeof stack === "string") stacks.push(stack);
-  }
   try {
-    const ids = debugIdsOf(stacks, (s) => s);
+    const stacks: string[] = [];
+    for (let e: unknown = payload; typeof e === "object" && e !== null; e = (e as { cause?: unknown }).cause) {
+      const stack = (e as { stack?: unknown }).stack;
+      if (typeof stack === "string") stacks.push(stack);
+    }
+    const ids = debugIdsOf(stacks, sameStack);
     if (ids !== undefined) payload.debug_ids = ids;
   } catch {
     // never into the app
